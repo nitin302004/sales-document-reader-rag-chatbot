@@ -1,155 +1,639 @@
-# **Finance Document Reader Chatbot CMI ADOR** 
+# Sales Document Reader & RAG Chatbot
 
-## **Objective**
-The objective is to build a financial document reader tool
-augmented by IA. The final product should be able to
-classify or summarize documents, discover predefined topics, recognize named
-entities or answer questions related to the provided document.
+An AI-powered document processing and question-answering application for sales documents.
 
-The Proof of Concept (PoC) should demonstrate how the tool can parse and extract financial entities from documents.
-Depending on the nature of the provided document you can use a rule-based parser, a
-NER model or a Large Language Model (LLM)
+The application allows users to upload sales documents, extract structured sales information, and ask questions about PDF documents using a Retrieval-Augmented Generation (RAG) pipeline.
 
-#### Architecture WI
-The first expected work item is a Global Architecture Document (GAD) that describes the interactions
-between the CMI Information System (IS) components and the document reader. The reader can be invoked
-programatically via APIs, and will also provide a User Interface (UI) enabling end users to upload a document and launch a
-classification, summarization, topic modelling, NER or Q&A feature. Documents will vary in size, format and level of
-confidentiality. They can be sent through different communication channels and processed in a synchronous or
-asynchronous way.
+The project uses Streamlit for the frontend, FastAPI for the backend, LangGraph for workflow orchestration, OpenAI for LLM and embeddings, and Chroma as the vector database.
 
-#### Handling Docx file
- Some kind of documents (e.g. docx files) can be processed by a rule-based parser coded in Python. For this
-work item, the expected artifact is a program that takes a document as input and returns a set of named entity values. The
-entities to extract are listed in the next slide. You can choose which Python packages to use and the format of the output
-files.
+---
 
+## 🚀 Features
 
-#### Handling .txt file
-Other kind of documents (e.g.chats) can be processed by a NER model. This work item is a combination of
-Python code and a Global Methodology Document (GMD). The Python code will give an overview of how to download and
-run a general-purpose NER model to extract named entities. You can choose which model to use. The methodology
-document will explain how this model can be fine-tuned to extract the financial entities listed in the next slide.
+- 📄 Upload sales documents
+- 🔍 Extract structured sales information
+- 📑 Support for PDF, DOCX and TXT documents
+- 🤖 AI-powered document processing
+- 🧠 LangGraph-based document workflow
+- 🔗 Retrieval-Augmented Generation (RAG)
+- 🗄️ Chroma vector database
+- 💬 Ask questions about uploaded PDF documents
+- ⚡ FastAPI backend
+- 🎨 Streamlit frontend
+- 🐳 Docker support
+- ☸️ Kubernetes deployment configuration
 
+---
 
-#### Handling PDF file 
-The last type of documents (e.g. pdf files) are more verbose, unstructured and require a more
-advanced language model. For this work item a GMD will explain how to build an entity extraction pipeline that relies on
-LLMs. The document will also include a description of the prompting and/or Retrieval-Augmented Generation (RAG)
-techniques to be used.
+## 📊 Sales Information Extraction
 
-# **Solution Proposed**
+The application is designed to identify important sales attributes such as:
 
-## * APP Hosted in Cloud
-The app is hosted in cloud and could be tested here using below URL
-https://cdor-app-817370516368.us-central1.run.app/
+- Order ID
+- Product
+- Category
+- Seller
+- Quantity
+- Unit Price
+- Discount
+- Revenue
+- Region
+- Sales Channel
 
-## **Tools & Technologies**
+Example:
 
-- **Streamlit** - For frontend 
-- **Fastapi** - For backend
-- **Langgraph & LangChain** : Here the using the langchain **agent** to decide what action to be taken based on the input file format.
-- **LLM** - OpenAI to process the PDF 
-- **VectorStore** - Chroma present in Langchain
-
-We choose to go with the Agent Exector architecture for our use case
-
-<img src="images/image.png" alt="LangGraph Flow" width="400" height="400" />
-
-
-
-If the format is docx, we use regex expressions to extract the data required.
-
-If the format is txt, we use NER via Spacy library to extract the required field. 
-Here we have tries using the EntityRuler to extract the information. 
-
-Same could be achieved via Matcher or ParseMatcher or via a customize training of the NLP model. 
-
-For the pdf, we store the pdf in chroma vector store. And Q&A could be performed on it.
-Since its POC and limitations are there to use OpenSource, accuracy would be less. 
-Replaced with Pinecone or other in PROD would give better results. 
-
-We can also ask the questions based on the documents uploaded. 
-We use basic RAG methodology here. 
-
-Below is the LangGraph generated 
-
-<img src="images/langGraph-flow.png" alt="LangGraph Flow" width="400" height="400" />
- 
-
-## **Chatbot Developed for POC**
-
-<img src="images/chatbot.png" alt="Chatbot"  />
-
-
-
-## **Below are output of files processed**
-
-## **For .txt file**
-
-<img src="images/txt-image.png" alt="Text file chatbot processing" width="400" height="400" />
-
-
-## **For .docx file**
-
-<img src="images/docx-image.png" alt="Docx file chatbot processing" width="400" height="400" />
-
-## **For pdf file**
-
-<img src="images/pdf_chat_output.png" alt="Pdf file chatbot processing" width="400" height="400" />
-
-<img src="images/console_output.png" alt="Pdf file chatbot processing"/>
-
-
-# Run the App 
-
-## **1. Install the dependencies**
-
-- Create .env file in root folder of the project and add the OPENAI_API_KEY key.
-
-
-- Create a conda or python environment and install all the depencies in requirements.txt
-
-```
-conda create -n myenv python=3.9
-conda activate myenv
-```
-- Install conda compatible packages 
-
-```
-conda install spacy pydantic requests python-dotenv python-docx pypdf regex
-```
-- Install remaining via pip 
-
-```
-pip install streamlit langchain langchain-chroma langchain-community langchain-core langchain-openai langgraph openai
+```text
+Order ID: ORD-2026-001
+Product: Laptop
+Category: Electronics
+Seller: Amazon
+Quantity: 25
+Unit Price: 74999
+Discount: 10%
+Revenue: 1,687,478
+Region: South India
+Sales Channel: Amazon
 ```
 
-## **2 To Run the Fast api , run the below command**
+---
 
+# 🏗️ System Architecture
+
+```text
+                         ┌─────────────────────┐
+                         │      Streamlit      │
+                         │     Frontend UI     │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │       FastAPI       │
+                         │       Backend       │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │      LangGraph      │
+                         │ Workflow / Router   │
+                         └──────────┬──────────┘
+                                    │
+                   ┌────────────────┼────────────────┐
+                   │                │                │
+                   ▼                ▼                ▼
+                ┌──────┐        ┌──────┐        ┌──────┐
+                │ TXT  │        │ DOCX │        │ PDF  │
+                └───┬──┘        └───┬──┘        └───┬──┘
+                    │               │               │
+                    ▼               ▼               ▼
+                 NLP /          Document          Text
+                 Rules           Parsing         Extraction
+                                                    │
+                                                    ▼
+                                                Chunking
+                                                    │
+                                                    ▼
+                                           OpenAI Embeddings
+                                                    │
+                                                    ▼
+                                             Chroma Vector DB
+                                                    │
+                                                    ▼
+                                                Retrieval
+                                                    │
+                                                    ▼
+                                               OpenAI LLM
+                                                    │
+                                                    ▼
+                                                 Answer
 ```
-python api.py
+
+---
+
+# 📄 Document Processing
+
+## TXT Documents
+
+TXT documents are processed using text and NLP-based techniques to identify relevant sales information.
+
+The processing pipeline identifies fields such as:
+
+```text
+Order ID
+Product
+Category
+Seller
+Quantity
+Unit Price
+Discount
+Revenue
+Region
+Sales Channel
 ```
 
-Api should run in  http://127.0.0.1:8000 ( in my case)
+---
 
-<img src="images/fastapi-log.png" alt="Fast API log" />
+## DOCX Documents
 
+DOCX documents are processed using Python-based document parsing.
 
-## **3 To Run the Streamlit app , run the below command**
+The extracted document content is passed through the sales information extraction pipeline to identify relevant fields.
 
+---
+
+## PDF Documents
+
+PDF documents are processed using an LLM-powered Retrieval-Augmented Generation pipeline.
+
+The PDF processing workflow is:
+
+```text
+PDF Upload
+    │
+    ▼
+Text Extraction
+    │
+    ▼
+Document Chunking
+    │
+    ▼
+OpenAI Embeddings
+    │
+    ▼
+Chroma Vector Store
+    │
+    ▼
+Similarity Search
+    │
+    ▼
+Relevant Document Chunks
+    │
+    ▼
+OpenAI LLM
+    │
+    ▼
+Answer
 ```
-streamlit run app.py
 
+This allows users to ask questions about the uploaded sales document.
+
+---
+
+# 💬 RAG Chatbot
+
+The application provides a chatbot for interacting with uploaded PDF sales documents.
+
+Example questions:
+
+```text
+What is the total revenue?
+
+Which product generated the highest revenue?
+
+How many units were sold?
+
+What is the unit price?
+
+What discount was applied?
+
+Which region generated the most sales?
+
+What is the sales channel?
+
+What is the Order ID?
 ```
 
-App should be available in http://localhost:8501 (in my case )
+The system retrieves relevant information from the document and provides it as context to the LLM before generating the answer.
 
-<img src="images/streamlit-log.png" alt="Streamlit log" />
+---
 
+# 🔗 LangGraph Workflow
 
-To test the chatbot, the files are present in data/ folder of the project.
+LangGraph is used to organize and control the document-processing workflow.
 
-For futher process, we can aime to deploy in cloud.
+The uploaded document is routed according to its file type.
 
+```text
+                    Document Upload
+                           │
+                           ▼
+                         Router
+                    ┌──────┼──────┐
+                    │      │      │
+                    ▼      ▼      ▼
+                   TXT    DOCX    PDF
+                    │      │      │
+                    ▼      ▼      ▼
+                  Text   Parser   PDF
+                Processing       Processing
+                                   │
+                                   ▼
+                              Vector Store
+                                   │
+                                   ▼
+                                  RAG
+                                   │
+                                   ▼
+                                  LLM
+                                   │
+                                   ▼
+                                Answer
+```
 
+This modular workflow makes it easier to extend the application with additional document formats and processing methods.
+
+---
+
+# 🛠️ Technology Stack
+
+| Technology | Purpose |
+|------------|---------|
+| Python | Core programming language |
+| FastAPI | Backend REST API |
+| Streamlit | Frontend web application |
+| LangGraph | Workflow orchestration |
+| LangChain | LLM and RAG components |
+| OpenAI | LLM and embeddings |
+| Chroma | Vector database |
+| spaCy | NLP processing |
+| PyPDF | PDF text extraction |
+| python-docx | DOCX processing |
+| Pydantic | Data validation |
+| Docker | Containerization |
+| Kubernetes | Deployment configuration |
+
+---
+
+# 📁 Project Structure
+
+```text
+sales_document_reader_chatbot/
+│
+├── api/
+│   ├── __init__.py
+│   ├── api.py
+│   ├── graph_builder.py
+│   │
+│   ├── nodes/
+│   │   ├── __init__.py
+│   │   ├── chat_history.py
+│   │   ├── docx_processing.py
+│   │   ├── pdf_processing.py
+│   │   ├── router.py
+│   │   └── text_processing.py
+│   │
+│   ├── tools/
+│   │   └── __init__.py
+│   │
+│   └── utils/
+│       ├── __init__.py
+│       └── state.py
+│
+├── app/
+│   └── app.py
+│
+├── images/
+│
+├── .streamlit/
+│   └── config.toml
+│
+├── Dockerfile.fastapi
+├── Dockerfile.streamlit
+├── entrypoint.sh
+├── k8-build.yaml
+├── requirements.txt
+├── README.md
+└── .gitignore
+```
+
+---
+
+# ⚙️ Installation
+
+## Prerequisites
+
+Make sure you have:
+
+- Python 3.11+
+- Git
+- OpenAI API key
+
+---
+
+## 1. Clone the Repository
+
+```bash
+git clone https://github.com/nitin302004/sales-document-reader-rag-chatbot.git
+
+cd sales-document-reader-rag-chatbot
+```
+
+---
+
+## 2. Create a Virtual Environment
+
+### macOS / Linux
+
+```bash
+python3 -m venv .venv
+
+source .venv/bin/activate
+```
+
+### Windows
+
+```bash
+python -m venv .venv
+
+.venv\Scripts\activate
+```
+
+---
+
+## 3. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+# 🔐 Environment Configuration
+
+Create a `.env` file in the root directory.
+
+```text
+OPENAI_API_KEY=your_openai_api_key
+```
+
+The project uses the environment variable to access OpenAI services.
+
+**Never commit your `.env` file or API key to GitHub.**
+
+The `.gitignore` file is configured to exclude `.env`.
+
+---
+
+# ▶️ Running the Application
+
+The application consists of two components:
+
+1. FastAPI backend
+2. Streamlit frontend
+
+Both should be running at the same time.
+
+---
+
+## 1. Start FastAPI
+
+From the project root:
+
+```bash
+./.venv/bin/uvicorn api.api:app --reload --port 8000
+```
+
+The backend will be available at:
+
+```text
+http://127.0.0.1:8000
+```
+
+FastAPI interactive documentation:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+---
+
+## 2. Start Streamlit
+
+Open another terminal.
+
+Navigate to the project:
+
+```bash
+cd /Users/nitin/Downloads/sales_document_reader_chatbot
+```
+
+Activate the virtual environment:
+
+```bash
+source .venv/bin/activate
+```
+
+Run:
+
+```bash
+streamlit run app/app.py
+```
+
+The Streamlit application will be available at:
+
+```text
+http://localhost:8501
+```
+
+---
+
+# 🔄 Application Workflow
+
+```text
+User
+ │
+ ▼
+Upload Sales Document
+ │
+ ▼
+Streamlit Frontend
+ │
+ ▼
+FastAPI Backend
+ │
+ ▼
+LangGraph Router
+ │
+ ├───────────────┐
+ │               │
+ ▼               ▼
+TXT/DOCX        PDF
+ │               │
+ ▼               ▼
+Extraction     Text Extraction
+ │               │
+ │               ▼
+ │            Chunking
+ │               │
+ │               ▼
+ │        OpenAI Embeddings
+ │               │
+ │               ▼
+ │          Chroma DB
+ │               │
+ │               ▼
+ │             RAG
+ │               │
+ └───────┬───────┘
+         │
+         ▼
+      Response
+```
+
+---
+
+# 🧠 RAG Architecture
+
+The PDF question-answering system follows the standard RAG architecture:
+
+```text
+                  Uploaded PDF
+                       │
+                       ▼
+                Text Extraction
+                       │
+                       ▼
+                 Text Splitting
+                       │
+                       ▼
+              Generate Embeddings
+                       │
+                       ▼
+               Chroma Vector DB
+                       │
+                  User Question
+                       │
+                       ▼
+                  Similarity Search
+                       │
+                       ▼
+              Relevant PDF Chunks
+                       │
+                       ▼
+                   OpenAI LLM
+                       │
+                       ▼
+                    Response
+```
+
+RAG helps the application provide document-grounded answers by retrieving relevant sections of the uploaded document before generating a response.
+
+---
+
+# 🌐 API
+
+The backend is implemented using FastAPI.
+
+Interactive API documentation is available at:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+The API handles document uploads and chatbot-related operations.
+
+---
+
+# 🐳 Docker
+
+The repository contains separate Docker configurations for the application components:
+
+```text
+Dockerfile.fastapi
+Dockerfile.streamlit
+```
+
+These can be used to containerize the FastAPI backend and Streamlit frontend.
+
+---
+
+# ☸️ Kubernetes
+
+The repository also contains:
+
+```text
+k8-build.yaml
+```
+
+which provides Kubernetes deployment configuration for deploying the application in a containerized environment.
+
+---
+
+# 🔒 Security
+
+Sensitive information should be stored using environment variables.
+
+The following are excluded from Git:
+
+```text
+.env
+.venv/
+__pycache__/
+*.pyc
+.chroma/
+chroma/
+chroma_db/
+.DS_Store
+```
+
+API keys should never be hardcoded in source code or committed to the repository.
+
+---
+
+# 🚀 Future Improvements
+
+The current project is a Proof of Concept.
+
+Possible future improvements include:
+
+- Improved sales entity extraction
+- More accurate PDF table extraction
+- Better document chunking
+- Metadata-aware retrieval
+- Improved RAG evaluation
+- Better handling of large documents
+- Persistent production-grade vector storage
+- Authentication and authorization
+- Asynchronous document processing
+- Automated unit and integration testing
+- Improved logging and monitoring
+- Cloud deployment
+- Additional document formats
+- Improved UI and visualization of extracted sales data
+
+---
+
+# 📸 Screenshots
+
+Screenshots of the Sales Document Reader application can be added here.
+
+Recommended screenshots include:
+
+1. Sales document upload
+2. Extracted sales information
+3. RAG chatbot question and answer
+4. FastAPI running
+5. Streamlit application
+
+Make sure screenshots do not contain API keys, credentials, or private documents.
+
+---
+
+# 👨‍💻 Author
+
+**Nitin**
+
+GitHub:
+
+https://github.com/nitin302004
+
+Project Repository:
+
+https://github.com/nitin302004/sales-document-reader-rag-chatbot
+
+---
+
+# 📌 Disclaimer
+
+This project is a Proof of Concept for sales document processing and Retrieval-Augmented Generation.
+
+The accuracy of extracted information and generated answers depends on the structure and quality of the uploaded documents and the underlying language model.
