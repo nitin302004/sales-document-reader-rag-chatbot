@@ -602,22 +602,6 @@ Possible future improvements include:
 
 ---
 
-# 📸 Screenshots
-
-Screenshots of the Sales Document Reader application can be added here.
-
-Recommended screenshots include:
-
-1. Sales document upload
-2. Extracted sales information
-3. RAG chatbot question and answer
-4. FastAPI running
-5. Streamlit application
-
-Make sure screenshots do not contain API keys, credentials, or private documents.
-
----
-
 # 👨‍💻 Author
 
 **Nitin**
