@@ -1,0 +1,12 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.chroma/
+chroma/
+chroma_db/
+temp_sales_rag/
+temp_Report.pdf
+temp_sales_rag_test_document.pdf
+temp_sales_test_document.pdf
+.DS_Store
